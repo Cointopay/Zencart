@@ -9,6 +9,8 @@ global $db;
 
 $order_id = $_REQUEST['CustomerReferenceNr'];
 $gkey = MODULE_PAYMENT_COINTOPAY_MERCHANT_ID;
+$api_key = MODULE_PAYMENT_COINTOPAY_API_KEY;
+
 if(isset($_GET['ConfirmCode']))
 {
     $data = [
@@ -16,6 +18,16 @@ if(isset($_GET['ConfirmCode']))
         'TransactionID' =>  $_GET['TransactionID'] ,
         'ConfirmCode' => $_GET['ConfirmCode']
     ];
+	$transactionData = fn_cointopay_transactiondetail($data);
+	if(200 !== $transactionData['status_code']){
+		echo $transactionData['message'];exit;
+	}
+	$value_data = "MerchantID=" . $transactionData['data']['MerchantID'] . "&AltCoinID=" . $transactionData['data']['AltCoinID'] . "&TransactionID=" . $_GET['TransactionID'] . "&coinAddress=" . $transactionData['data']['coinAddress'] . "&CustomerReferenceNr=" . 
+	$_GET['CustomerReferenceNr'] . "&SecurityCode=" . $transactionData['data']['SecurityCode'] . "&inputCurrency=" . $transactionData['data']['inputCurrency'];
+	$ConfirmCode = fn_cointopay_calculateRFC2104HMAC($api_key, $value_data);
+	if($ConfirmCode !== $_GET['ConfirmCode']){
+		echo 'Data mismatch! Data doesn\'t match with Cointopay.';exit;
+	}
     $response = validateOrder($data);
 
     if($response->Status !== $_GET['status'])
@@ -107,5 +119,40 @@ function  validateOrder($data)
     }
     echo $response;
 }
+function  fn_cointopay_transactiondetail($data)
+{
+       $params = array(
+       "authentication:1",
+       'cache-control: no-cache',
+       );
+       $ch = curl_init();
+       curl_setopt_array($ch, array(
+       CURLOPT_URL => 'https://app.cointopay.com/v2REAPI?',
+       //CURLOPT_USERPWD => $this->apikey,
+       CURLOPT_POSTFIELDS => 'Call=Transactiondetail&MerchantID='.$data['mid'].'&output=json&ConfirmCode='.$data['ConfirmCode'].'&APIKey=a',
+       CURLOPT_RETURNTRANSFER => true,
+       CURLOPT_SSL_VERIFYPEER => false,
+       CURLOPT_HTTPHEADER => $params,
+       CURLOPT_USERAGENT => 1,
+       CURLOPT_HTTPAUTH => CURLAUTH_BASIC
+       )
+       );
+       $response = curl_exec($ch);
+       $results = json_decode($response, true);
+       /*if($results->CustomerReferenceNr)
+       {
+           return $results;
+       }*/
+       return $results;
+       exit();
+}
+function fn_cointopay_calculateRFC2104HMAC($key, $data)
+{
+	$s = hash_hmac('sha256', $data, $key, true);
 
+	return strtoupper(fn_cointopay_base64url_encode($s));
+}
+function fn_cointopay_base64url_encode($data) {
+	return strtoupper(rtrim(strtr(base64_encode($data), '+/', '-_'), '='));
+}
 

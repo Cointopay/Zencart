@@ -8,6 +8,7 @@ class Cointopay extends base
 
   private $merchant_id;
   private $security_code;
+  private $api_key;
 
   function cointopay()
   {
@@ -16,6 +17,7 @@ class Cointopay extends base
     $this->description      = MODULE_PAYMENT_COINTOPAY_TEXT_DESCRIPTION;
     $this->merchant_id      = MODULE_PAYMENT_COINTOPAY_MERCHANT_ID;
     $this->security_code    = MODULE_PAYMENT_COINTOPAY_SECURITY_CODE;
+	$this->api_key    = MODULE_PAYMENT_COINTOPAY_API_KEY;
     $this->enabled          = ((MODULE_PAYMENT_COINTOPAY_STATUS == 'True') ? true : false);
   }
 
@@ -122,6 +124,7 @@ class Cointopay extends base
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Cointopay Module', 'MODULE_PAYMENT_COINTOPAY_STATUS', 'False', 'Enable the Cointopay bitcoin plugin?', '6', '0', 'zen_cfg_select_option(array(\'True\', \'False\'), ', now())");
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Cointopay Merchant Id', 'MODULE_PAYMENT_COINTOPAY_MERCHANT_ID', '0', 'Your Cointopay Merchant Id', '6', '0', now())");
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Cointopay Security Code', 'MODULE_PAYMENT_COINTOPAY_SECURITY_CODE', '0', 'Your Cointopay Security Code', '6', '0', now())");
+    $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Cointopay API Key', 'MODULE_PAYMENT_COINTOPAY_API_KEY', '0', 'Your Cointopay API Key', '6', '0', now())");
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Paid Order Status', 'MODULE_PAYMENT_COINTOPAY_PAID_STATUS_ID', '5', 'Status in your store when Cointopay order status is paid.<br />(\'Paid\' recommended)', '6', '6', 'zen_cfg_pull_down_order_statuses(', 'zen_get_order_status_name', now())");
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Failed Order Status', 'MODULE_PAYMENT_COINTOPAY_FAILED_STATUS_ID', '6', 'Status in your store when Cointopay order status is failed.<br />(\'Failed\' recommended)', '6', '6', 'zen_cfg_pull_down_order_statuses(', 'zen_get_order_status_name', now())");
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Paidnotenough Order Status', 'MODULE_PAYMENT_COINTOPAY_PAIDNOTENOUGH_STATUS_ID', '7', 'Status in your store when Cointopay order status is paidnotenough.<br />(\'Paidnotenough\' recommended)', '6', '6', 'zen_cfg_pull_down_order_statuses(', 'zen_get_order_status_name', now())");
@@ -156,6 +159,7 @@ class Cointopay extends base
       'MODULE_PAYMENT_COINTOPAY_STATUS',
       'MODULE_PAYMENT_COINTOPAY_MERCHANT_ID',
       'MODULE_PAYMENT_COINTOPAY_SECURITY_CODE',
+	  'MODULE_PAYMENT_COINTOPAY_API_KEY',
       'MODULE_PAYMENT_COINTOPAY_PAID_STATUS_ID',
       'MODULE_PAYMENT_COINTOPAY_FAILED_STATUS_ID',
       'MODULE_PAYMENT_COINTOPAY_PAIDNOTENOUGH_STATUS_ID'
