@@ -54,7 +54,8 @@ class Cointopay
 
         # Check if credentials was passed
         if (empty($merchant_id) || empty($security_code))
-            \cointopay\Exception::throwException(400, array('reason' => 'CredentialsMissing'));
+            //throw new Exception(400, array('reason' => 'CredentialsMissing'));
+		echo 'CredentialsMissing';exit;
 
         if (isset($params) && !empty($params)) {
             $amount = $params['price'];
@@ -100,7 +101,8 @@ class Cointopay
         ));
         $response = json_decode(curl_exec($curl), TRUE);
 		if (is_string($response)){
-				\cointopay\Exception::throwException(401, array('reason' => 'BadCredentials:'.$response));
+				//throw new Exception(401, array('reason' => 'BadCredentials:'.$response));
+				echo $response;exit;
 		}
         $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
