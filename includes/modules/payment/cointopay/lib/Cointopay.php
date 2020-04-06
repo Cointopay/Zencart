@@ -53,9 +53,9 @@ class Cointopay
         $request_check = '';
 
         # Check if credentials was passed
-        if (empty($merchant_id) || empty($security_code))
-            //throw new Exception(400, array('reason' => 'CredentialsMissing'));
+        if (empty($merchant_id) || empty($security_code)){
 		echo 'CredentialsMissing';exit;
+		}
 
         if (isset($params) && !empty($params)) {
             $amount = $params['price'];
@@ -65,7 +65,6 @@ class Cointopay
             $cancel_url = $params['cancel_url'];
             $selected_currency = (isset($params['selected_currency']) && !empty($params['selected_currency'])) ? $params['selected_currency'] : 1;
         }
-
         if ($url == 'merchant') {
             $request_check = 'merchant';
             $url = "MerchantAPI?Checkout=true&MerchantID=$merchant_id&Amount=10&AltCoinID=$selected_currency&CustomerReferenceNr=testmerchant&SecurityCode=$security_code&inputCurrency=EUR&output=json&testmerchant";
@@ -100,8 +99,7 @@ class Cointopay
             CURLOPT_USERAGENT => $user_agent
         ));
         $response = json_decode(curl_exec($curl), TRUE);
-		if (is_string($response)){
-				//throw new Exception(401, array('reason' => 'BadCredentials:'.$response));
+		if (is_string($response) && $response != 'testmerchant success'){
 				echo $response;exit;
 		}
         $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);

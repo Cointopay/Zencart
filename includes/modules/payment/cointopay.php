@@ -73,7 +73,7 @@ class Cointopay extends base
       'price'            => number_format($info['total'], 2, '.', ''),
       'currency'         => $info['currency'],
       'callback_url'     => $this->flash_encode($callback . "?token=" . MODULE_PAYMENT_COINTOPAY_CALLBACK_SECRET),
-      'cancel_url'       => zen_href_link('index'),
+      'cancel_url'       => $this->flash_encode($callback . "?token=" . MODULE_PAYMENT_COINTOPAY_CALLBACK_SECRET),
       'success_url'      => zen_href_link('checkout_success'),
       'title'            => $configuration->fields['configuration_value'] . ' Order #' . $insert_id,
       'description'      => join($description, ', ')

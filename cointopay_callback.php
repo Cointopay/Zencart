@@ -23,13 +23,16 @@ if(isset($_GET['ConfirmCode']))
 	}
 	
     $response = validateOrder($data);
-
-    if($response->Status !== $_GET['status'])
+    if(is_string($response)) {
+		throw new Exception($response);
+	}
+    if($response['Status'] !== $_REQUEST['status'])
     {
-        echo "We have detected different order status. Your order has been halted.";
+        echo "We have detected different order status. Your order status is ". $response['Status'];
         exit;
     }
-    if($response->CustomerReferenceNr == $_GET['CustomerReferenceNr'])
+
+    if($response->CustomerReferenceNr == $_REQUEST['CustomerReferenceNr'])
     {
         $order = $db->Execute("select orders_id from " . TABLE_ORDERS . " where orders_id = '" . intval($order_id) . "' limit 1");
         if (!$order || !$order->fields['orders_id'])
@@ -106,12 +109,8 @@ function  validateOrder($data)
         )
     );
     $response = curl_exec($ch);
-    $results = json_decode($response);
-    if($results->CustomerReferenceNr)
-    {
-        return $results;
-    }
-    echo $response;
+    $results = json_decode($response, true);
+    return $results;
 }
 function  fn_cointopay_transactiondetail($data)
 {

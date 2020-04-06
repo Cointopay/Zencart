@@ -7,6 +7,8 @@ Cointopay plugin for Zencart store!
 
 Sign up for Cointopay account at <https://cointopay.com>
 
+Please follow the Zencart Cointopay Plugin install instructions mentioned here: <a href="https://docs.google.com/document/d/1mGTCBQnmxHp7J4312MbQg3vZC4sVVZVp0y9xGkPnsAA/edit?usp=sharing">download Zencart Cointopay Plugin documentation</a> or direct link: https://docs.google.com/document/d/1mGTCBQnmxHp7J4312MbQg3vZC4sVVZVp0y9xGkPnsAA/edit?usp=sharing
+
 
 ### Via FTP
 
