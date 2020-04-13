@@ -21,6 +21,45 @@ if(isset($_GET['ConfirmCode']))
 	if(200 !== $transactionData['status_code']){
 		echo $transactionData['message'];exit;
 	}
+	else{
+		if($transactionData['data']['Security'] != $_GET['ConfirmCode']){
+			echo "Data mismatch! ConfirmCode doesn\'t match";
+			exit;
+		}
+		elseif($transactionData['data']['CustomerReferenceNr'] != $_GET['CustomerReferenceNr']){
+			echo "Data mismatch! CustomerReferenceNr doesn\'t match";
+			exit;
+		}
+		elseif($transactionData['data']['TransactionID'] != $_GET['TransactionID']){
+			echo "Data mismatch! TransactionID doesn\'t match";
+			exit;
+		}
+		elseif($transactionData['data']['AltCoinID'] != $_GET['AltCoinID']){
+			echo "Data mismatch! AltCoinID doesn\'t match";
+			exit;
+		}
+		elseif($transactionData['data']['MerchantID'] != $_GET['MerchantID']){
+			echo "Data mismatch! MerchantID doesn\'t match";
+			exit;
+		}
+		elseif($transactionData['data']['coinAddress'] != $_GET['CoinAddressUsed']){
+			echo "Data mismatch! coinAddress doesn\'t match";
+			exit;
+		}
+		elseif($transactionData['data']['SecurityCode'] != $_GET['SecurityCode']){
+			echo "Data mismatch! SecurityCode doesn\'t match";
+			exit;
+		}
+		elseif($transactionData['data']['inputCurrency'] != $_GET['inputCurrency']){
+			echo "Data mismatch! inputCurrency doesn\'t match";
+			exit;
+		}
+		elseif($transactionData['data']['Status'] != $_GET['status']){
+			echo "Data mismatch! status doesn\'t match. Your order status is ".$transactionData['data']['Status'];
+			exit;
+		}
+		
+	}
 	
     $response = validateOrder($data);
     if(is_string($response)) {
