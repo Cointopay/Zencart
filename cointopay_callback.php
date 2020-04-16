@@ -34,23 +34,23 @@ if(isset($_GET['ConfirmCode']))
 			echo "Data mismatch! TransactionID doesn\'t match";
 			exit;
 		}
-		elseif($transactionData['data']['AltCoinID'] != $_GET['AltCoinID']){
+		elseif(isset($_GET['AltCoinID']) && $transactionData['data']['AltCoinID'] != $_GET['AltCoinID']){
 			echo "Data mismatch! AltCoinID doesn\'t match";
 			exit;
 		}
-		elseif($transactionData['data']['MerchantID'] != $_GET['MerchantID']){
+		elseif(isset($_GET['MerchantID']) && $transactionData['data']['MerchantID'] != $_GET['MerchantID']){
 			echo "Data mismatch! MerchantID doesn\'t match";
 			exit;
 		}
-		elseif($transactionData['data']['coinAddress'] != $_GET['CoinAddressUsed']){
+		elseif(isset($_GET['CoinAddressUsed']) && $transactionData['data']['coinAddress'] != $_GET['CoinAddressUsed']){
 			echo "Data mismatch! coinAddress doesn\'t match";
 			exit;
 		}
-		elseif($transactionData['data']['SecurityCode'] != $_GET['SecurityCode']){
+		elseif(isset($_GET['SecurityCode']) && $transactionData['data']['SecurityCode'] != $_GET['SecurityCode']){
 			echo "Data mismatch! SecurityCode doesn\'t match";
 			exit;
 		}
-		elseif($transactionData['data']['inputCurrency'] != $_GET['inputCurrency']){
+		elseif(isset($_GET['inputCurrency']) && $transactionData['data']['inputCurrency'] != $_GET['inputCurrency']){
 			echo "Data mismatch! inputCurrency doesn\'t match";
 			exit;
 		}
