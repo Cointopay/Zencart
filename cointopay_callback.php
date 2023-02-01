@@ -9,8 +9,29 @@ global $db;
 
 $order_id = $_REQUEST['CustomerReferenceNr'];
 $gkey = MODULE_PAYMENT_COINTOPAY_MERCHANT_ID;
+$ctpStrStart = '<style>
+body, html {
+  height: 100%;
+  margin: 0;
+}
+.middle {
+	width: 50%;
+	padding: 8%;
+	margin: auto;
+	background: #f9f9f9;
+	border-radius: 10px;
+	transform: translate(0%,50%);
+}
+@media only screen and (max-width: 991px) {
+  .middle {
+	width: 98%;
+  }
+}
+</style>
+<center><div class="middle">';
+$ctpStrEnd = '</div></center>';
 
-if(isset($_GET['ConfirmCode']))
+if (isset($_GET['ConfirmCode']))
 {
     $data = [
         'mid' => $gkey,
@@ -18,67 +39,76 @@ if(isset($_GET['ConfirmCode']))
         'ConfirmCode' => $_GET['ConfirmCode']
     ];
 	$transactionData = fn_cointopay_transactiondetail($data);
-	if(200 !== $transactionData['status_code']){
-		echo $transactionData['message'];exit;
+	if (200 !== $transactionData['status_code']){
+		echo $ctpStrStart."<h2>".$transactionData['message']."</h2>".$ctpStrEnd;exit;
 	}
-	else{
-		if($transactionData['data']['Security'] != $_GET['ConfirmCode']){
-			echo "Data mismatch! ConfirmCode doesn\'t match";
+	else {
+		if ($transactionData['data']['Security'] != $_GET['ConfirmCode']){
+			echo $ctpStrStart."<h2>Data mismatch! ConfirmCode doesn't match.</h2>".$ctpStrEnd;
 			exit;
 		}
-		elseif($transactionData['data']['CustomerReferenceNr'] != $_GET['CustomerReferenceNr']){
-			echo "Data mismatch! CustomerReferenceNr doesn\'t match";
+		elseif ($transactionData['data']['CustomerReferenceNr'] != $_GET['CustomerReferenceNr']){
+			echo $ctpStrStart."<h2>Data mismatch! CustomerReferenceNr doesn't match.</h2>".$ctpStrEnd;
 			exit;
 		}
-		elseif($transactionData['data']['TransactionID'] != $_GET['TransactionID']){
-			echo "Data mismatch! TransactionID doesn\'t match";
+		elseif ($transactionData['data']['TransactionID'] != $_GET['TransactionID']){
+			echo $ctpStrStart."<h2>Data mismatch! TransactionID doesn't match.</h2>".$ctpStrEnd;
 			exit;
 		}
-		elseif(isset($_GET['AltCoinID']) && $transactionData['data']['AltCoinID'] != $_GET['AltCoinID']){
-			echo "Data mismatch! AltCoinID doesn\'t match";
+		elseif (isset($_GET['AltCoinID']) && $transactionData['data']['AltCoinID'] != $_GET['AltCoinID']){
+			echo $ctpStrStart."<h2>Data mismatch! AltCoinID doesn't match.</h2>".$ctpStrEnd;
 			exit;
 		}
-		elseif(isset($_GET['MerchantID']) && $transactionData['data']['MerchantID'] != $_GET['MerchantID']){
-			echo "Data mismatch! MerchantID doesn\'t match";
+		elseif (isset($_GET['MerchantID']) && $transactionData['data']['MerchantID'] != $_GET['MerchantID']){
+			echo $ctpStrStart."<h2>Data mismatch! MerchantID doesn't match.</h2>".$ctpStrEnd;
 			exit;
 		}
-		elseif(isset($_GET['CoinAddressUsed']) && $transactionData['data']['coinAddress'] != $_GET['CoinAddressUsed']){
-			echo "Data mismatch! coinAddress doesn\'t match";
+		elseif (isset($_GET['CoinAddressUsed']) && $transactionData['data']['coinAddress'] != $_GET['CoinAddressUsed']){
+			echo $ctpStrStart."<h2>Data mismatch! coinAddress doesn't match.</h2>".$ctpStrEnd;
 			exit;
 		}
-		elseif(isset($_GET['SecurityCode']) && $transactionData['data']['SecurityCode'] != $_GET['SecurityCode']){
-			echo "Data mismatch! SecurityCode doesn\'t match";
+		elseif (isset($_GET['SecurityCode']) && $transactionData['data']['SecurityCode'] != $_GET['SecurityCode']){
+			echo $ctpStrStart."<h2>Data mismatch! SecurityCode doesn't match.</h2>".$ctpStrEnd;
 			exit;
 		}
-		elseif(isset($_GET['inputCurrency']) && $transactionData['data']['inputCurrency'] != $_GET['inputCurrency']){
-			echo "Data mismatch! inputCurrency doesn\'t match";
+		elseif (isset($_GET['inputCurrency']) && $transactionData['data']['inputCurrency'] != $_GET['inputCurrency']){
+			echo $ctpStrStart."<h2>Data mismatch! inputCurrency doesn't match.</h2>".$ctpStrEnd;
 			exit;
 		}
-		elseif($transactionData['data']['Status'] != $_GET['status']){
-			echo "Data mismatch! status doesn\'t match. Your order status is ".$transactionData['data']['Status'];
-			exit;
+		elseif ($transactionData['data']['Status'] != $_GET['status']){
+			if ($transactionData['data']['Status'] == 'expired') {
+				echo $ctpStrStart."<h2>Your order status is ".$transactionData['data']['Status'].". <a href='https://cointopay.com/invoice/".$_GET['ConfirmCode']."' target='_blank'>Invoice link</a></h2>".$ctpStrEnd;
+				exit;
+			}
+			elseif ($transactionData['data']['Status'] == 'underpaid') {
+				echo $ctpStrStart."<h2>Your order status is ".$transactionData['data']['Status'].". <a href='https://cointopay.com/invoice/".$_GET['ConfirmCode']."' target='_blank'>Invoice link</a></h2>".$ctpStrEnd;
+				exit;
+			} else {
+				echo $ctpStrStart."<h2>Data mismatch! status doesn't match. Your order status is ".$transactionData['data']['Status'].".</h2>".$ctpStrEnd;
+				exit;
+			}
 		}
 		
 	}
 	
     $response = validateOrder($data);
-    if(is_string($response)) {
+    if (is_string($response)) {
 		throw new Exception($response);
 	}
-    if($response['Status'] !== $_REQUEST['status'])
+    if ($response['Status'] !== $_REQUEST['status'])
     {
-        echo "We have detected different order status. Your order status is ". $response['Status'];
+        echo $ctpStrStart."<h2>We have detected different order status. Your order status is ". $response['Status'].".</h2>".$ctpStrEnd;
         exit;
     }
 
-    if($response->CustomerReferenceNr == $_REQUEST['CustomerReferenceNr'])
+    if ($response['CustomerReferenceNr'] == $_REQUEST['CustomerReferenceNr'])
     {
         $order = $db->Execute("select orders_id from " . TABLE_ORDERS . " where orders_id = '" . intval($order_id) . "' limit 1");
         if (!$order || !$order->fields['orders_id'])
             throw new Exception('Order #' . $order_id . ' does not exists');
 
         $redirect_url = '';
-        if($_REQUEST['status']== 'paid' && $_REQUEST['notenough'] == 0 )
+        if ($_REQUEST['status']== 'paid' && $_REQUEST['notenough'] == 0 )
         {
             $ctp_order_status = MODULE_PAYMENT_COINTOPAY_PAID_STATUS_ID;
             $redirect_url  = zen_href_link('checkout_success');
@@ -89,7 +119,7 @@ if(isset($_GET['ConfirmCode']))
             $ctp_order_status = MODULE_PAYMENT_COINTOPAY_FAILED_STATUS_ID;
             $redirect_url  = zen_href_link('index');
         }
-        else{
+        else {
             $ctp_order_status = NULL;
             $redirect_url  = zen_href_link(FILENAME_CHECKOUT_PAYMENT);
         }
@@ -98,32 +128,42 @@ if(isset($_GET['ConfirmCode']))
             $db->Execute("update ". TABLE_ORDERS. " set orders_status = " . $ctp_order_status . " where orders_id = ". intval($order_id));
 
         $date =  (new \DateTime())->format('Y-m-d H:i:s');
-        if($_REQUEST['status']== 'paid' && $_REQUEST['notenough'] == 0){
+        if ($_REQUEST['status']== 'paid' && $_REQUEST['notenough'] == 0){
 
 
             $db->Execute("insert into " . TABLE_ORDERS_STATUS_HISTORY . " (orders_id, orders_status_id, date_added, customer_notified, comments) values ('$order_id', '$ctp_order_status', '$date', '1', 'Payment completed notification from Cointopay')");
         }
 
-        if($_REQUEST['status']== 'paid' && $_REQUEST['notenough'] == 1){
+        if ($_REQUEST['status']== 'paid' && $_REQUEST['notenough'] == 1){
 
             $db->Execute("insert into " . TABLE_ORDERS_STATUS_HISTORY . " (orders_id, orders_status_id, date_added, customer_notified, comments) values ('$order_id', '$ctp_order_status', '$date', '1', 'Payment failed notification from Cointopay because notenough')");
         }
 
-        if($_REQUEST['status']== 'failed'){
+        if ($_REQUEST['status']== 'failed'){
 
             $db->Execute("insert into " . TABLE_ORDERS_STATUS_HISTORY . " (orders_id, orders_status_id, date_added, customer_notified, comments) values ('$order_id', '$ctp_order_status', '$date', '1', 'Payment failed notification from Cointopay')");
+        }
+		if ($_REQUEST['status']== 'expired'){
+
+            echo $ctpStrStart."<h2>Your order status is ".$_REQUEST['status'].". <a href='https://cointopay.com/invoice/".$_GET['ConfirmCode']."' target='_blank'>Invoice link</a></h2>".$ctpStrEnd;
+			exit;
+        }
+		if ($_REQUEST['status']== 'underpaid'){
+
+            echo $ctpStrStart."<h2>Your order status is ".$_REQUEST['status'].". <a href='https://cointopay.com/invoice/".$_GET['ConfirmCode']."' target='_blank'>Invoice link</a></h2>".$ctpStrEnd;
+			exit;
         }
         zen_redirect($redirect_url);
     }
     else
     {
-        echo "order id not match";
+        echo $ctpStrStart."<h2>order id not match.</h2>".$ctpStrEnd;
         exit;
     }
 }
 else
 {
-    echo "ConfirmCode not match";
+    echo $ctpStrStart."<h2>ConfirmCode not match.</h2>".$ctpStrEnd;
     exit;
 }
 
