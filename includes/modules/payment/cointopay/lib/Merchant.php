@@ -1,4 +1,6 @@
 <?php
 namespace cointopay;
 
-class Merchant {}
+class Merchant
+{
+}

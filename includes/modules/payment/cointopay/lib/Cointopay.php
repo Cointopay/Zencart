@@ -14,26 +14,31 @@ class Cointopay
 
     public static function config($authentication)
     {
-        if (isset($authentication['merchant_id']))
+        if (isset($authentication['merchant_id'])) {
             self::$merchant_id = $authentication['merchant_id'];
+        }
 
-        if (isset($authentication['security_code']))
+        if (isset($authentication['security_code'])) {
             self::$security_code = $authentication['security_code'];
+        }
 
-        if (isset($authentication['default_currency']))
+        if (isset($authentication['default_currency'])) {
             self::$default_currency = $authentication['default_currency'];
+        }
 
-        if (isset($authentication['user_agent']))
+        if (isset($authentication['user_agent'])) {
             self::$user_agent = $authentication['user_agent'];
+        }
 
-        if (isset($authentication['selected_currency']))
+        if (isset($authentication['selected_currency'])) {
             self::$selected_currency = $authentication['selected_currency'];
+        }
     }
 
-    public static function verifyMerchant($authentication = array())
+    public static function verifyMerchant($authentication = [])
     {
         try {
-            $response = self::request('merchant', 'GET', array(), $authentication);
+            $response = self::request('merchant', 'GET', [], $authentication);
             if ($response != "testmerchant success") {
                 return $response;
             }
@@ -43,8 +48,7 @@ class Cointopay
         }
     }
 
-
-    public static function request($url, $method = 'GET', $params = array(), $authentication = array())
+    public static function request($url, $method = 'GET', $params = [], $authentication = [])
     {
         $merchant_id = isset($authentication['merchant_id']) ? $authentication['merchant_id'] : self::$merchant_id;
         $security_code = isset($authentication['security_code']) ? $authentication['security_code'] : self::$security_code;
@@ -53,9 +57,10 @@ class Cointopay
         $request_check = '';
 
         # Check if credentials was passed
-        if (empty($merchant_id) || empty($security_code)){
-		echo 'CredentialsMissing';exit;
-		}
+        if (empty($merchant_id) || empty($security_code)) {
+            echo 'CredentialsMissing';
+            exit;
+        }
 
         if (isset($params) && !empty($params)) {
             $amount = $params['price'];
@@ -72,12 +77,10 @@ class Cointopay
             $result = self::callApi($url, $user_agent);
             return $result;
         } else {
-
             $url = "MerchantAPI?Checkout=true&MerchantID=$merchant_id&Amount=$amount&AltCoinID=$selected_currency&CustomerReferenceNr=$order_id&SecurityCode=$security_code&inputCurrency=$currency&output=json&testmerchant";
             $result = self::callApi($url, $user_agent);
 
             if ($result == 'testmerchant success') {
-
                 $url = "MerchantAPI?Checkout=true&MerchantID=$merchant_id&Amount=$amount&AltCoinID=$selected_currency&CustomerReferenceNr=$order_id&SecurityCode=$security_code&output=json&inputCurrency=$currency&transactionconfirmurl=$callback_url&transactionfailurl=$cancel_url";
                 $result = self::callApi($url, $user_agent);
                 return $result;
@@ -89,19 +92,19 @@ class Cointopay
 
     public static function callApi($url, $user_agent)
     {
-
         $url = 'https://cointopay.com/' . $url;
 
         $curl = curl_init();
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_URL => $url,
             CURLOPT_USERAGENT => $user_agent
-        ));
-        $response = json_decode(curl_exec($curl), TRUE);
-		if (is_string($response) && $response != 'testmerchant success'){
-				echo $response;exit;
-		}
+        ]);
+        $response = json_decode(curl_exec($curl), true);
+        if (is_string($response) && $response != 'testmerchant success') {
+            echo $response;
+            exit;
+        }
         $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 

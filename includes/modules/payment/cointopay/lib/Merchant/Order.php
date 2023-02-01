@@ -13,7 +13,7 @@ class Order extends Merchant
         $this->order = $order;
     }
 
-    public static function createOrFail($params, $options = array(), $authentication = array())
+    public static function createOrFail($params, $options = [], $authentication = [])
     {
         $order = Cointopay::request('orders', 'GET', $params, $authentication);
         return new self($order);
