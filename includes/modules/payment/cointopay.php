@@ -5,18 +5,25 @@ class Cointopay extends base
     public $code;
     public $title;
     public $enabled;
+    public $sort_order;
+    public $description;
 
     private $merchant_id;
     private $security_code;
 
-    public function cointopay()
+    public function __construct()
     {
         $this->code             = 'cointopay';
         $this->title            = MODULE_PAYMENT_COINTOPAY_TEXT_TITLE;
         $this->description      = MODULE_PAYMENT_COINTOPAY_TEXT_DESCRIPTION;
-        $this->merchant_id      = MODULE_PAYMENT_COINTOPAY_MERCHANT_ID;
-        $this->security_code    = MODULE_PAYMENT_COINTOPAY_SECURITY_CODE;
-        $this->enabled          = ((MODULE_PAYMENT_COINTOPAY_STATUS == 'True') ? true : false);
+        $this->merchant_id      = defined('MODULE_PAYMENT_COINTOPAY_MERCHANT_ID') ? MODULE_PAYMENT_COINTOPAY_MERCHANT_ID : null;
+        $this->security_code    = defined('MODULE_PAYMENT_COINTOPAY_SECURITY_CODE') ? MODULE_PAYMENT_COINTOPAY_SECURITY_CODE : null;
+        $this->enabled          = defined('MODULE_PAYMENT_COINTOPAY_STATUS') ? ((MODULE_PAYMENT_COINTOPAY_STATUS == 'True') ? true : false) : false;
+        $this->sort_order = defined('MODULE_PAYMENT_COINTOPAY_SORT_ORDER') ? (int)MODULE_PAYMENT_COINTOPAY_SORT_ORDER : null;
+
+        if (null === $this->sort_order) {
+          return false;
+        }
     }
 
     public function javascript_validation()
@@ -75,7 +82,7 @@ class Cointopay extends base
           'cancel_url'       => $this->flash_encode($callback . "?token=" . MODULE_PAYMENT_COINTOPAY_CALLBACK_SECRET),
           'success_url'      => zen_href_link('checkout_success'),
           'title'            => $configuration->fields['configuration_value'] . ' Order #' . $insert_id,
-          'description'      => join($description, ', ')
+          'description'      => join(', ', $description)
         ];
 
         require_once dirname(__FILE__) . "/cointopay/init.php";
@@ -117,6 +124,8 @@ class Cointopay extends base
 
         $callbackSecret = md5('zencart_' . mt_rand());
 
+        $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Sort order of display.', 'MODULE_PAYMENT_COINTOPAY_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first.', 6, 1, NULL, NULL, now())");
+
         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Cointopay Module', 'MODULE_PAYMENT_COINTOPAY_STATUS', 'False', 'Enable the Cointopay bitcoin plugin?', '6', '0', 'zen_cfg_select_option(array(\'True\', \'False\'), ', now())");
         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Cointopay Merchant Id', 'MODULE_PAYMENT_COINTOPAY_MERCHANT_ID', '0', 'Your Cointopay Merchant Id', '6', '0', now())");
         $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Cointopay Security Code', 'MODULE_PAYMENT_COINTOPAY_SECURITY_CODE', '0', 'Your Cointopay Security Code', '6', '0', now())");
@@ -152,6 +161,7 @@ class Cointopay extends base
     {
         return [
           'MODULE_PAYMENT_COINTOPAY_STATUS',
+          'MODULE_PAYMENT_COINTOPAY_SORT_ORDER',
           'MODULE_PAYMENT_COINTOPAY_MERCHANT_ID',
           'MODULE_PAYMENT_COINTOPAY_SECURITY_CODE',
           'MODULE_PAYMENT_COINTOPAY_PAID_STATUS_ID',
