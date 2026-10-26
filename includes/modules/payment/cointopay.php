@@ -1,22 +1,23 @@
 <?php
-
 class Cointopay extends base
 {
-    public $code;
-    public $title;
-    public $enabled;
+	public $code;
+	public $title;
+	public $description;
+	public $enabled;
+	private $_check;
 
-    private $merchant_id;
-    private $security_code;
+	private $merchant_id;
+	private $security_code;
+	public $order_status;
 
-    public function cointopay()
-    {
+    function __construct() {
         $this->code             = 'cointopay';
         $this->title            = MODULE_PAYMENT_COINTOPAY_TEXT_TITLE;
         $this->description      = MODULE_PAYMENT_COINTOPAY_TEXT_DESCRIPTION;
-        $this->merchant_id      = MODULE_PAYMENT_COINTOPAY_MERCHANT_ID;
-        $this->security_code    = MODULE_PAYMENT_COINTOPAY_SECURITY_CODE;
-        $this->enabled          = ((MODULE_PAYMENT_COINTOPAY_STATUS == 'True') ? true : false);
+        $this->merchant_id      = zen_config('MODULE_PAYMENT_COINTOPAY_MERCHANT_ID');
+        $this->security_code    = zen_config('MODULE_PAYMENT_COINTOPAY_SECURITY_CODE');
+        $this->enabled          = ((zen_config('MODULE_PAYMENT_COINTOPAY_STATUS') == 'True') ? true : false);
     }
 
     public function javascript_validation()
@@ -65,25 +66,25 @@ class Cointopay extends base
             $products->MoveNext();
         }
 
-        $callback = zen_href_link('cointopay_callback.php', $parameters='', $connection='NONSSL', $add_session_id=true, $search_engine_safe=true, $static=true);
+        $callback = zen_href_link('cointopay_callback.php', '', 'SSL',false,false,true);
 
         $params = [
           'order_id'         => $insert_id,
           'price'            => number_format($info['total'], 2, '.', ''),
           'currency'         => $info['currency'],
-          'callback_url'     => $this->flash_encode($callback . "?token=" . MODULE_PAYMENT_COINTOPAY_CALLBACK_SECRET),
-          'cancel_url'       => $this->flash_encode($callback . "?token=" . MODULE_PAYMENT_COINTOPAY_CALLBACK_SECRET),
+          'callback_url'     => $this->flash_encode($callback . "?token=" . zen_config('MODULE_PAYMENT_COINTOPAY_CALLBACK_SECRET')),
+          'cancel_url'       => $this->flash_encode($callback . "?token=" . zen_config('MODULE_PAYMENT_COINTOPAY_CALLBACK_SECRET')),
           'success_url'      => zen_href_link('checkout_success'),
           'title'            => $configuration->fields['configuration_value'] . ' Order #' . $insert_id,
-          'description'      => join($description, ', ')
+          'description'      => $description,
         ];
 
         require_once dirname(__FILE__) . "/cointopay/init.php";
         require_once dirname(__FILE__) . "/cointopay/version.php";
 
         $order = \Cointopay\Merchant\Order::createOrFail($params, [], [
-          'merchant_id' => MODULE_PAYMENT_COINTOPAY_MERCHANT_ID,
-          'security_code' => MODULE_PAYMENT_COINTOPAY_SECURITY_CODE,
+          'merchant_id' => zen_config('MODULE_PAYMENT_COINTOPAY_MERCHANT_ID'),
+          'security_code' => zen_config('MODULE_PAYMENT_COINTOPAY_SECURITY_CODE'),
           'user_agent' => 'Cointopay - ZenCart Extension v' . COINTOPAY_ZENCART_EXTENSION_VERSION]);
 
         $_SESSION['cart']->reset(true);
@@ -163,9 +164,4 @@ class Cointopay extends base
     {
         return rawurlencode(utf8_encode($input));
     }
-}
-
-function cointopay_censorize($value)
-{
-    return "(hidden for security reasons)";
 }
