@@ -12,7 +12,7 @@ Please follow the Zencart Cointopay Plugin install instructions mentioned here: 
 
 ### Via FTP
 
-1. Download [cointopay-zencart-v1](https://github.com/Cointopay/Zencart/archive/refs/tags/cointopay-zencart-v2.zip)
+1. Download [cointopay-zencart-v2](https://github.com/Cointopay/Zencart/archive/refs/tags/cointopay-zencart-v2.zip)
 
 2. Extract downloaded zip. Upload **includes** directory, **cointopay_process.php** and **cointopay_callback.php** file to the **root** directory of your Zencart installation.
 
