@@ -12,9 +12,9 @@ Please follow the Zencart Cointopay Plugin install instructions mentioned here: 
 
 ### Via FTP
 
-1. Download [cointopay-zencart-v1](https://github.com/Cointopay/Zencart/archive/refs/tags/cointopay-zencart-v1.zip)
+1. Download [cointopay-zencart-v1](https://github.com/Cointopay/Zencart/archive/refs/tags/cointopay-zencart-v2.zip)
 
-2. Extract downloaded zip. Upload **includes** directory and **cointopay_callback.php** file to the **root** directory of your Zencart installation.
+2. Extract downloaded zip. Upload **includes** directory, **cointopay_process.php** and **cointopay_callback.php** file to the **root** directory of your Zencart installation.
 
 3. Login to your Zencart store admin panel and go to **Modules » Payment**. Click Install module, then click Cointopay International.
 
